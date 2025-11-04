@@ -1,0 +1,16 @@
+Here are the contents for the file `/LongCatUnlimitedVideoGeneratorForMac/resources/config/settings.plist`:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>VideoQuality</key>
+    <string>High</string>
+    <key>DefaultTemplate</key>
+    <string>default_template.mov</string>
+    <key>OutputDirectory</key>
+    <string>/Users/username/Videos/LongCatUnlimited</string>
+    <key>AutoSave</key>
+    <true/>
+</dict>
+</plist>

@@ -1,0 +1,33 @@
+# macOS / Xcode
+.DS_Store
+build/
+DerivedData/
+*.xcworkspace
+*.xcuserstate
+
+# SwiftPM build artifacts
+/.build
+/.swiftpm
+
+# Ignore local model weights and large assets
+weights/
+weights/*
+**/weights/
+**/models/
+models/*.bin
+models/*.pt
+models/*.safetensors
+*.ckpt
+*.pth
+*.onnx
+
+# Ignore large media templates (add when needed)
+resources/templates/default_template.mov
+resources/templates/*.mov
+resources/templates/*.mp4
+
+# Temp files
+*.swp
+*.tmp
+*.temp
+*.log
