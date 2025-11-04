@@ -218,3 +218,47 @@ We would like to thank the contributors to the [Wan](https://huggingface.co/Wan-
 
 ## Contact
 Please contact us at <a href="mailto:longcat-team@meituan.com">longcat-team@meituan.com</a> or join our WeChat Group if you have any questions.
+
+## Large files and model placement
+
+This repository intentionally excludes the large model weight files and (optionally) large media templates from git to keep the repository small and pushable. Below are recommended locations and quick instructions to prepare them locally.
+
+Which files to keep out of git
+- Model weights and checkpoints: `*.safetensors`, `*.pt`, `*.pth`, `*.ckpt`, `*.onnx`.
+- Large media templates: `resources/templates/*.mov`, `resources/templates/*.mp4`.
+
+Recommended local placement
+- Repo-local (single-machine): place model files under `weights/LongCat-Video/` (this folder is ignored by `.gitignore`). Place optional templates under `resources/templates/`.
+- Centralized (multi-machine): keep the models in a centralized path such as `~/models/LongCat-Video/` and use `scripts/prepare_models.sh` to copy or symlink files into the repo as needed.
+
+Using `scripts/prepare_models.sh`
+- Copy models into the repo (creates `weights/LongCat-Video` if needed):
+
+```bash
+chmod +x scripts/prepare_models.sh
+./scripts/prepare_models.sh /path/to/downloaded/weights /absolute/path/to/LongCat-Video/weights/LongCat-Video
+```
+
+- Or create a symlink to an external model store:
+
+```bash
+mkdir -p weights
+ln -s ~/models/LongCat-Video weights/LongCat-Video
+```
+
+Pre-push safety
+- A `.gitignore` has been added to exclude `weights/` and common model file extensions. Run `git status` before pushing to confirm no large files are staged.
+- If you want model files stored in the remote, consider using Git LFS (instructions below).
+
+Using Git LFS (optional)
+- To enable Git LFS for model files:
+
+```bash
+git lfs install
+git lfs track "*.safetensors" "*.pt" "*.pth" "*.ckpt" "*.onnx"
+git add .gitattributes
+git commit -m "chore: enable Git LFS for model files"
+git push origin main
+```
+
+If you'd like, I can add a `scripts/prepush-check.sh` and a `.git/hooks/pre-push` hook that prevents committing large files by mistake.

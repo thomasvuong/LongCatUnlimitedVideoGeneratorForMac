@@ -1,3 +1,40 @@
+# macOS
+.DS_Store
+
+# Python / virtualenv
+venv/
+env/
+*.pyc
+__pycache__/
+
+# Conda env
+/.conda/
+
+# Model weights and large assets
+weights/
+weights/*
+**/weights/
+models/
+models/*
+**/models/
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+*.onnx
+
+# Large media/templates
+resources/templates/*.mov
+resources/templates/*.mp4
+
+# Logs & temp
+*.log
+*.tmp
+*.temp
+
+# Editor / OS
+.vscode/
+*.swp
 *.mp4
 *.DS_Store
 weights/
