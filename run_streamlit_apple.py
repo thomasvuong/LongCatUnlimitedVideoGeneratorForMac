@@ -242,33 +242,8 @@ def main():
             width, height = resolution_options[resolution_choice]
 
             # Ensure frames are compatible (divisible by 4 + 1)
+
             frame_options = [5, 9, 13, 17, 25, 33]
-            num_frames = st.selectbox(
-                "Number of Frames (per segment)",
-                options=frame_options,
-                index=1,  # Default to 9 frames
-                help="More frames = longer video but slower generation. If you want a multi-minute video, use Segmented mode below.",
-            )
-
-            st.markdown("---")
-            st.subheader("Duration / Long-video settings")
-
-            # FPS selection affects final duration calculation
-            fps = st.selectbox(
-                "Output FPS",
-                options=[8, 15, 24, 30],
-                index=1,
-                help="Frames per second when saving the final video. Higher FPS -> smoother, larger file",
-            )
-
-            # Mode: single segment or segmented stitching
-            long_mode = st.radio(
-                "Generation Mode",
-                options=["Single segment", "Segmented (stitch multiple segments)"],
-                index=0,
-                help="Segmented mode stitches multiple generation calls to create long videos (recommended for minutes-long outputs)",
-            )
-
             # Duration presets (seconds) and custom input
             duration_preset = st.selectbox(
                 "Target duration (preset)",
@@ -285,6 +260,51 @@ def main():
                     custom_seconds = int(duration_preset[:-1])
                 elif duration_preset.endswith("m"):
                     custom_seconds = int(duration_preset[:-1]) * 60
+
+            # FPS selection affects final duration calculation
+            fps = st.selectbox(
+                "Output FPS",
+                options=[8, 15, 24, 30],
+                index=1,
+                help="Frames per second when saving the final video. Higher FPS -> smoother, larger file",
+            )
+
+            # If not segmented mode, auto-set num_frames from duration preset
+            if st.session_state.get('long_mode', 'Single segment').startswith("Segmented"):
+                num_frames = st.selectbox(
+                    "Number of Frames (per segment)",
+                    options=frame_options,
+                    index=1,  # Default to 9 frames
+                    help="More frames = longer video but slower generation. If you want a multi-minute video, use Segmented mode below.",
+                )
+            else:
+                # Single segment: auto-calculate num_frames from duration preset
+                if custom_seconds is not None:
+                    # Model constraint: (num_frames - 1) % 4 == 0
+                    raw_frames = int(custom_seconds * fps)
+                    num_frames = ((raw_frames - 1) // 4) * 4 + 1
+                    if num_frames < 5:
+                        num_frames = 5
+                else:
+                    num_frames = st.selectbox(
+                        "Number of Frames (per segment)",
+                        options=frame_options,
+                        index=1,  # Default to 9 frames
+                        help="More frames = longer video but slower generation. If you want a multi-minute video, use Segmented mode below.",
+                    )
+
+
+            st.markdown("---")
+            st.subheader("Duration / Long-video settings")
+
+            # Mode: single segment or segmented stitching
+            long_mode = st.radio(
+                "Generation Mode",
+                options=["Single segment", "Segmented (stitch multiple segments)"],
+                index=0,
+                help="Segmented mode stitches multiple generation calls to create long videos (recommended for minutes-long outputs)",
+            )
+            st.session_state['long_mode'] = long_mode
 
             # Segmented settings: per-segment frames and conditioning overlap
             if long_mode.startswith("Segmented"):
@@ -705,6 +725,7 @@ def generate_video_ui(
                 with col2:
                     st.subheader("📋 Generation Details")
 
+
                     # Get frame count safely
                     frame_count = 0
                     if video_frames is not None:
@@ -713,7 +734,6 @@ def generate_video_ui(
                                 # Shape (B, N, H, W, C)
                                 frame_count = video_frames.shape[1]
                             elif len(video_frames.shape) == 4:
-                                # Shape (N, H, W, C)
                                 frame_count = video_frames.shape[0]
                         elif isinstance(video_frames, (list, tuple)):
                             frame_count = len(video_frames)
@@ -724,8 +744,9 @@ def generate_video_ui(
                     st.text(f"Guidance Scale: {guidance_scale}")
                     st.text(f"Seed: {seed}")
 
+                    # Use the selected FPS for duration calculation
+                    duration = frame_count / fps if fps > 0 else 0
                     if frame_count > 0:
-                        duration = frame_count / 8  # 8 FPS
                         st.text(f"Duration: ~{duration:.1f} seconds")
 
                         # Show all frames as a grid
@@ -741,7 +762,6 @@ def generate_video_ui(
                                     # Shape (B, N, H, W, C)
                                     frame = video_frames[0, i]
                                 elif len(video_frames.shape) == 4:
-                                    # Shape (N, H, W, C)
                                     frame = video_frames[i]
                             elif isinstance(video_frames, (list, tuple)):
                                 frame = video_frames[i]
