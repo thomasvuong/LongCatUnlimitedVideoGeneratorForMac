@@ -355,42 +355,42 @@ def main():
         st.info(f"⏱️ Estimated generation time: {time_estimate}")
 
         # Generate button
-            if st.button("🎬 Generate Video", type="primary", use_container_width=True):
-                # Pass long-video related settings into the generator
-                if long_mode.startswith("Segmented"):
-                    generate_video_ui(
-                        pipeline,
-                        prompt,
-                        negative_prompt,
-                        width,
-                        height,
-                        num_frames,
-                        num_inference_steps,
-                        guidance_scale,
-                        seed,
-                        long_mode=long_mode,
-                        fps=fps,
-                        seg_num_frames=seg_num_frames,
-                        num_cond_frames=num_cond_frames,
-                        generate_segments=generate_segments,
-                    )
-                else:
-                    generate_video_ui(
-                        pipeline,
-                        prompt,
-                        negative_prompt,
-                        width,
-                        height,
-                        num_frames,
-                        num_inference_steps,
-                        guidance_scale,
-                        seed,
-                        long_mode=long_mode,
-                        fps=fps,
-                        seg_num_frames=None,
-                        num_cond_frames=None,
-                        generate_segments=0,
-                    )
+        if st.button("🎬 Generate Video", type="primary", use_container_width=True):
+            # Pass long-video related settings into the generator
+            if long_mode.startswith("Segmented"):
+                generate_video_ui(
+                    pipeline,
+                    prompt,
+                    negative_prompt,
+                    width,
+                    height,
+                    num_frames,
+                    num_inference_steps,
+                    guidance_scale,
+                    seed,
+                    long_mode=long_mode,
+                    fps=fps,
+                    seg_num_frames=seg_num_frames,
+                    num_cond_frames=num_cond_frames,
+                    generate_segments=generate_segments,
+                )
+            else:
+                generate_video_ui(
+                    pipeline,
+                    prompt,
+                    negative_prompt,
+                    width,
+                    height,
+                    num_frames,
+                    num_inference_steps,
+                    guidance_scale,
+                    seed,
+                    long_mode=long_mode,
+                    fps=fps,
+                    seg_num_frames=None,
+                    num_cond_frames=None,
+                    generate_segments=0,
+                )
 
     with col2:
         st.header("💡 Tips")
@@ -482,7 +482,7 @@ def generate_video_ui(
 
         status_text.text("Initializing generation...")
 
-            try:
+        try:
             # Set up generator
             device = torch.device("cpu")
             generator = torch.Generator(device=device).manual_seed(
